@@ -12,4 +12,4 @@ async def test_auth():
     try:
         await nalog._make_auth()
     except Exception as ex:
-        assert(ex, RefreshTokenNotFoundError)
+        assert isinstance(ex, RefreshTokenNotFoundError)
