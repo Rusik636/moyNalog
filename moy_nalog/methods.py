@@ -130,13 +130,13 @@ class AddIncomeMethod(BaseMethod):
             "services": [
                 {
                     "name": name,
-                    "amount": amount.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP),
-                    "quantity": quantity,
+                    "amount": float(amount.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)),
+                    "quantity": int(quantity),
                 }
             ],
-            "totalAmount": (amount * quantity).quantize(
+            "totalAmount": float((amount * quantity).quantize(
                 Decimal("0.01"), rounding=ROUND_HALF_UP
-            ),
+            )),
         }
         response = await self._make_request(
             connection=self.connection, url="income", headers=headers, json=body
