@@ -1,9 +1,10 @@
 [tool.poetry]
 name = "moy-nalog"
-version = "0.1.5"
+version = "0.1.6"
 description = "Async Python API for lknpd.nalog.ru"
 authors = ["Ben Puls <mail@benpuls.ru>"]
 readme = "README.md"
+repository = "https://github.com/byBenPuls/moy_nalog"
 
 [tool.poetry.dependencies]
 python = ">=3.8"
