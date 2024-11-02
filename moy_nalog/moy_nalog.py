@@ -74,7 +74,7 @@ class MoyNalog:
         self,
         name: str,
         amount: Union[int, float],
-        quantity: int,
+        quantity: int = 1,
         date: str | datetime = datetime.now(),
     ):
         await self._execute_method(
