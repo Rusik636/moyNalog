@@ -51,8 +51,8 @@ class MoyNalog:
 
     async def _get_token(self) -> str:
         if (
-            self.__token.value
-            and self.__token.expire_in
+            self.__token
+            and self.__token
             and int(time.time() * 1000) + 60 * 1000
             < int(self.__token.expire_in.timestamp() * 1000)
         ):
@@ -78,7 +78,7 @@ class MoyNalog:
         date: str | datetime = datetime.now(),
     ):
         await self._execute_method(
-            self._income.execute(),
+            self._income,
             inn=self.__inn,
             name=name,
             amount=amount,
@@ -90,11 +90,11 @@ class MoyNalog:
         pass
 
     async def _execute(self, method: T, **kwargs) -> T:
-        return await method.execute(kwargs)
+        return await method.execute(**kwargs)
 
     async def _execute_method(self, method: BaseMethod, **kwargs) -> BaseMethod:
         token = await self._get_token()
-        await self._execute(method, token, kwargs)
+        await self._execute(method, token=token, **kwargs)
 
     async def __aenter__(self):
         return self
