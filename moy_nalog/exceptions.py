@@ -4,3 +4,7 @@ class RefreshTokenNotFoundError(Exception):
 
 class RejectedIncomeError(Exception):
     pass
+
+
+class NalogMethodError(Exception):
+    pass
