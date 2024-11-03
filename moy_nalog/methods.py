@@ -3,19 +3,30 @@ from decimal import Decimal, ROUND_HALF_UP
 from typing import Tuple, Optional, Union
 from dataclasses import dataclass
 
+from httpx import HTTPStatusError
+
 from moy_nalog.http import HttpConnection, HEADERS, BASE_URL
-from moy_nalog.exceptions import RefreshTokenNotFoundError, RejectedIncomeError
+from moy_nalog.exceptions import (
+    RefreshTokenNotFoundError,
+    RejectedIncomeError,
+    NalogMethodError,
+)
 from moy_nalog.types import Token, Income
 
 
 @dataclass
 class BaseMethod:
     async def _make_request(
-        self, connection: HttpConnection, url: str, **kwargs
+        self, connection: HttpConnection, url: str, type_: str = "post", **kwargs
     ) -> dict:
         async with connection as conn:
-            response = await conn.post(url, **kwargs)
-            response.raise_for_status()
+            response = await conn.post(url, **kwargs) if type_ == "post" else await conn.get(url, **kwargs)
+            try:
+                response.raise_for_status()
+            except HTTPStatusError:
+                raise NalogMethodError(
+                    f"{response.json().get("message") or f"Unexpected {response.status_code} code"}"
+                )
             return response.json()
 
     async def execute(self, connection: HttpConnection):
@@ -85,7 +96,7 @@ class AddIncomeMethod(BaseMethod):
 
     def _date_to_local_iso(
         self,
-        date: datetime.datetime | str = datetime.datetime.now(),
+        date: datetime.datetime | str = datetime.datetime.now().utcnow(),
     ) -> str:
         if isinstance(date, str):
             date = datetime.fromisoformat(date)
@@ -130,13 +141,15 @@ class AddIncomeMethod(BaseMethod):
             "services": [
                 {
                     "name": name,
-                    "amount": float(amount.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)),
+                    "amount": float(
+                        amount.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+                    ),
                     "quantity": int(quantity),
                 }
             ],
-            "totalAmount": float((amount * quantity).quantize(
-                Decimal("0.01"), rounding=ROUND_HALF_UP
-            )),
+            "totalAmount": float(
+                (amount * quantity).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+            ),
         }
         response = await self._make_request(
             connection=self.connection, url="income", headers=headers, json=body
@@ -144,7 +157,7 @@ class AddIncomeMethod(BaseMethod):
         return response
 
     async def get_information_about_income(self, url: str) -> dict:
-        return await self._make_request(self.connection, url=url)
+        return await self._make_request(self.connection, url=url, type_="get")
 
     async def execute(
         self,
@@ -160,7 +173,7 @@ class AddIncomeMethod(BaseMethod):
         )
         if not response or not response.get("approvedReceiptUuid"):
             raise RejectedIncomeError("Check your params.")
-
+        
         url = f"{BASE_URL}/receipt/{inn}/{response.get("approvedReceiptUuid")}"
 
         income = Income(
@@ -169,5 +182,6 @@ class AddIncomeMethod(BaseMethod):
             json_url=f"{url}/json",
             print_url=f"{url}/print",
         )
-
-        return await self.get_information_about_income(income.json_url)
+        # TODO: Make check information
+        # return await self.get_information_about_income(income.json_url)
+        return None
