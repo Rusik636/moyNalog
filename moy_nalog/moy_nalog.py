@@ -54,7 +54,9 @@ class MoyNalog:
             self.__token
             and self.__token
             and int(time.time() * 1000) + 60 * 1000
-            < int(self.__token.expire_in.timestamp() * 1000)
+            < int(datetime.fromisoformat(
+                self.__token.expire_in.replace("Z", "+00:00")
+                ).timestamp() * 1000)
         ):
             return self.__token.value
 
