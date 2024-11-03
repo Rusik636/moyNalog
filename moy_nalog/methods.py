@@ -15,6 +15,7 @@ class BaseMethod:
     ) -> dict:
         async with connection as conn:
             response = await conn.post(url, **kwargs)
+            response.raise_for_status()
             return response.json()
 
     async def execute(self, connection: HttpConnection):
@@ -53,7 +54,7 @@ class AuthMethod(BaseMethod):
         body = {**self._common_body, "refreshToken": refresh_token}
         response = await self._make_request(connection, url="/auth/token", json=body)
         return Token(
-            value=response.get("Token"),
+            value=response.get("token"),
             expire_in=response.get("tokenExpireIn"),
             refresh_value=response.get("refreshToken")
             if response.get("refreshToken")
@@ -64,7 +65,6 @@ class AuthMethod(BaseMethod):
         self,
     ) -> Tuple[str, Token]:
         body = {"username": self.login, "password": self.password, **self._common_body}
-
         response = await self._make_request(
             self.connection, url="/auth/lkfl", json=body
         )
@@ -84,11 +84,11 @@ class AddIncomeMethod(BaseMethod):
     connection: HttpConnection
 
     def _date_to_local_iso(
+        self,
         date: datetime.datetime | str = datetime.datetime.now(),
     ) -> str:
         if isinstance(date, str):
             date = datetime.fromisoformat(date)
-
         offset = date.utcoffset().total_seconds() / 60 if date.utcoffset() else 0
         absoff = abs(offset)
 
@@ -161,7 +161,7 @@ class AddIncomeMethod(BaseMethod):
         if not response or not response.get("approvedReceiptUuid"):
             raise RejectedIncomeError("Check your params.")
 
-        url = f"{BASE_URL}/receipt/{self.inn}/{response.get("approvedReceiptUuid")}"
+        url = f"{BASE_URL}/receipt/{inn}/{response.get("approvedReceiptUuid")}"
 
         income = Income(
             id=response.get("approvedReceiptUuid"),
