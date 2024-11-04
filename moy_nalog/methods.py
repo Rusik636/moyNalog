@@ -186,4 +186,4 @@ class AddIncomeMethod(BaseMethod):
         )
         # TODO: Make check information
         # return await self.get_information_about_income(income.json_url)
-        return None
+        return income
