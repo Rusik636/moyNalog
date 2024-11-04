@@ -12,6 +12,7 @@ from moy_nalog.exceptions import (
     NalogMethodError,
 )
 from moy_nalog.types import Token, Income
+from moy_nalog.loggers import methods
 
 
 @dataclass
@@ -20,10 +21,15 @@ class BaseMethod:
         self, connection: HttpConnection, url: str, type_: str = "post", **kwargs
     ) -> dict:
         async with connection as conn:
-            response = await conn.post(url, **kwargs) if type_ == "post" else await conn.get(url, **kwargs)
+            response = (
+                await conn.post(url, **kwargs)
+                if type_ == "post"
+                else await conn.get(url, **kwargs)
+            )
             try:
                 response.raise_for_status()
             except HTTPStatusError:
+                methods.exception("Unexpected status code")
                 raise NalogMethodError(
                     f"{response.json().get("message") or f"Unexpected {response.status_code} code"}"
                 )
@@ -153,6 +159,7 @@ class AddIncomeMethod(BaseMethod):
                 (amount * quantity).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
             ),
         }
+        methods.debug(f"{body}")
         response = await self._make_request(
             connection=self.connection, url="income", headers=headers, json=body
         )
@@ -175,7 +182,7 @@ class AddIncomeMethod(BaseMethod):
         )
         if not response or not response.get("approvedReceiptUuid"):
             raise RejectedIncomeError("Check your params.")
-        
+
         url = f"{BASE_URL}/receipt/{inn}/{response.get("approvedReceiptUuid")}"
 
         income = Income(
