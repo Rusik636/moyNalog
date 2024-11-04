@@ -99,7 +99,7 @@ class AddIncomeMethod(BaseMethod):
         date: datetime.datetime | str | None = None,
     ) -> str:
         if date is None:
-            date = datetime.datetime.now().utcnow()
+            date = datetime.datetime.now()
         if isinstance(date, str):
             date = datetime.fromisoformat(date)
         offset = date.utcoffset().total_seconds() / 60 if date.utcoffset() else 0
