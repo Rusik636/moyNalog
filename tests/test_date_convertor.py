@@ -3,14 +3,13 @@ from datetime import datetime, timezone
 from moy_nalog.methods import AddIncomeMethod
 
 
-
 class TestDateToLocalISO:
     instance = AddIncomeMethod("test")
     method = instance._date_to_local_iso
 
     def test_current_date(self):
         assert self.method(datetime.now())
-    
+
     def test_special_date(self):
         # check on ISO 6801
         # https://ru.wikipedia.org/wiki/ISO_8601
