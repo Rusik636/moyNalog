@@ -4,7 +4,7 @@ import random
 import string
 import time
 
-from moy_nalog.methods import BaseMethod, AuthMethod, AddIncomeMethod
+from moy_nalog.methods import BaseMethod, AuthMethod, AddIncomeMethod, UserInfoMethod
 from moy_nalog.http import HttpConnection
 from moy_nalog.types import Token
 
@@ -22,7 +22,7 @@ class MoyNalog:
 
         self._auth: AuthMethod = self._init_auth_method()
         self._income: AddIncomeMethod = self._init_income_method()
-
+        self._user_info: UserInfoMethod = self._init_user_info_method()
         self._authorized: bool = False
 
         self.__token: Optional[Token] = None
@@ -38,6 +38,9 @@ class MoyNalog:
 
     def _init_income_method(self) -> AddIncomeMethod:
         return AddIncomeMethod(self._connection)
+    
+    def _init_user_info_method(self) -> UserInfoMethod:
+        return UserInfoMethod(self._connection)
 
     def _create_device_id(self) -> str:
         return "".join(random.choices(string.ascii_lowercase + string.digits, k=22))
@@ -92,7 +95,7 @@ class MoyNalog:
         )
 
     async def get_user_info(self):
-        pass
+        await self._execute_method(self._user_info)
 
     async def _execute(self, method: T, **kwargs) -> T:
         return await method.execute(**kwargs)
