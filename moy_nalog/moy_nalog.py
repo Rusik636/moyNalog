@@ -38,7 +38,7 @@ class MoyNalog:
 
     def _init_income_method(self) -> AddIncomeMethod:
         return AddIncomeMethod(self._connection)
-    
+
     def _init_user_info_method(self) -> UserInfoMethod:
         return UserInfoMethod(self._connection)
 
