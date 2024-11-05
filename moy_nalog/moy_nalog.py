@@ -95,14 +95,14 @@ class MoyNalog:
         )
 
     async def get_user_info(self):
-        await self._execute_method(self._user_info)
+        return await self._execute_method(self._user_info)
 
     async def _execute(self, method: T, **kwargs) -> T:
         return await method.execute(**kwargs)
 
     async def _execute_method(self, method: BaseMethod, **kwargs) -> BaseMethod:
         token = await self._get_token()
-        await self._execute(method, token=token, **kwargs)
+        return await self._execute(method, token=token, **kwargs)
 
     async def __aenter__(self):
         return self
