@@ -12,7 +12,7 @@ from moy_nalog.exceptions import (
     NalogMethodError,
     AuthorizationError,
 )
-from moy_nalog.types import Token, Income
+from moy_nalog.types import Token, Income, User
 from moy_nalog.loggers import methods
 
 
@@ -207,10 +207,32 @@ class AddIncomeMethod(BaseMethod):
 class UserInfoMethod(BaseMethod):
     connection: HttpConnection
 
-    async def execute(self):
+    async def execute(self, token: str):
+        headers = {"authorization": f"Bearer {token}", **HEADERS}
         try:
-            return await self._make_request(
-                self.connection, url="user", headers=HEADERS
+            json = await self._make_request(
+                self.connection, url="user", type_="get", headers=headers
+            )
+            return User(
+                last_name=json.get("lastName"),
+                id=json.get("id"),
+                display_name=json.get("displayName"),
+                middle_name=json.get("middleName"),
+                email=json.get("email"),
+                phone=json.get("phone"),
+                inn=json.get("inn"),
+                snils=json.get("snils"),
+                avatar_exists=json.get("avatarExists"),
+                initial_registration_date=json.get("initialRegistrationDate"),
+                registration_date=json.get("registrationDate"),
+                first_receipt_register_time=json.get("firstReceiptRegisterTime"),
+                first_receipt_cancel_time=json.get("firstReceiptCancelTime"),
+                hide_cancelled_receipt=json.get("hideCancelledReceipt"),
+                register_available=json.get("registerAvailable"),
+                status=json.get("status"),
+                restricted_mode=json.get("restrictedMode"),
+                pfr_url=json.get("pfrUrl"),
+                login=json.get("login"),
             )
         except NalogMethodError as ex:
             raise AuthorizationError(f"{str(ex)}")
