@@ -102,12 +102,17 @@ class AddIncomeMethod(BaseMethod):
 
     def _date_to_local_iso(
         self,
-        date: datetime.datetime | str | None = None,
+        date: datetime.datetime | None = None,
     ) -> str:
         if date is None:
-            date = datetime.datetime.now()
-        if isinstance(date, str):
-            date = datetime.fromisoformat(date)
+            date = (
+                datetime.datetime.now().astimezone().replace(microsecond=0).isoformat()
+            )
+        if isinstance(date, datetime.datetime):
+            date = date.replace(hour=23, minute=59, second=59).astimezone().isoformat()
+        return date
+        # deprecated
+        """
         offset = date.utcoffset().total_seconds() / 60 if date.utcoffset() else 0
         absoff = abs(offset)
 
@@ -122,6 +127,7 @@ class AddIncomeMethod(BaseMethod):
         offset_string = f"{sign}{str(hours).zfill(2)}:{str(minutes).zfill(2)}"
 
         return iso_string + offset_string
+        """
 
     async def send_income(
         self,
