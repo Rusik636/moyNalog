@@ -10,6 +10,7 @@ from moy_nalog.exceptions import (
     RefreshTokenNotFoundError,
     RejectedIncomeError,
     NalogMethodError,
+    AuthorizationError,
 )
 from moy_nalog.types import Token, Income
 from moy_nalog.loggers import methods
@@ -200,3 +201,16 @@ class AddIncomeMethod(BaseMethod):
         # TODO: Make check information
         # return await self.get_information_about_income(income.json_url)
         return income
+
+
+@dataclass
+class UserInfoMethod(BaseMethod):
+    connection: HttpConnection
+
+    async def execute(self):
+        try:
+            return await self._make_request(
+                self.connection, url="user", headers=HEADERS
+            )
+        except NalogMethodError as ex:
+            raise AuthorizationError(f"{str(ex)}")
