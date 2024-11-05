@@ -8,3 +8,7 @@ class RejectedIncomeError(Exception):
 
 class NalogMethodError(Exception):
     pass
+
+
+class AuthorizationError(Exception):
+    pass
