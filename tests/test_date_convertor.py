@@ -1,11 +1,11 @@
 from datetime import datetime, timezone, timedelta
 
-from moy_nalog.methods import AddIncomeMethod
+from moy_nalog.methods.method import BaseMethod
 
 
 class TestDateToLocalISO:
-    instance = AddIncomeMethod("test")
-    method = instance._date_to_local_iso
+    instance = BaseMethod("nothing")
+    method = instance._format_date_to_local_iso
 
     def test_current_date(self):
         assert self.method(datetime.now())
