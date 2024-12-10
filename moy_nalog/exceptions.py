@@ -12,3 +12,7 @@ class NalogMethodError(Exception):
 
 class AuthorizationError(Exception):
     pass
+
+
+class AccessTokenNotFoundError(Exception):
+    pass
