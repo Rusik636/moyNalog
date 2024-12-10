@@ -1,13 +1,15 @@
 # Moy Nalog
 
+Неофициальная асинхронная библиотека **moy_nalog** предоставляет API для автоматизации отчётности самозанятых на [lknpd.nalog.ru](https://npd.nalog.ru/web-app/).
 
-Usage example:
+
+Пример использования:
 
 ```python
 import asyncio
 from moy_nalog import MoyNalog
 
-nalog = MoyNalog("inn", "pass")
+nalog = MoyNalog("1234567890", "MyStrongPassword")
 
 
 async def main():
