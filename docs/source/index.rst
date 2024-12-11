@@ -1,10 +1,13 @@
 MoyNalog
 =============================================
 
+Неофициальная асинхронная библиотека **moy_nalog** предоставляет API для автоматизации отчётности самозанятых на `lknpd.nalog.ru <https://npd.nalog.ru/web-app/>`_.
+
+
 .. include:: installation/index.rst
 
 
-Simple usage
+Пример использования
 ------------
 
 .. literalinclude:: ../../examples/add_income.py
