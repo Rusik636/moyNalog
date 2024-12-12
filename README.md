@@ -7,6 +7,7 @@
 
 ```python
 import asyncio
+
 from moy_nalog import MoyNalog
 
 nalog = MoyNalog("1234567890", "MyStrongPassword")
